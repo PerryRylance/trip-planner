@@ -1,55 +1,49 @@
-import {
-  Refine,
-  GitHubBanner,
-  WelcomePage,
-  Authenticated,
-  AuthPage,
-  ErrorComponent,
-} from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-
-import { BrowserRouter, Route, Routes, Outlet } from "react-router-dom";
-import routerBindings, {
-  NavigateToResource,
-  CatchAllNavigate,
-  UnsavedChangesNotifier,
-} from "@refinedev/react-router-v6";
+import { Refine } from "@refinedev/core";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HeadlessInferencer } from "@refinedev/inferencer/headless";
 import dataProvider from "@refinedev/simple-rest";
-import {
-  BlogPostList,
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostShow,
-} from "pages/blog-posts";
-import {
-  CategoryList,
-  CategoryCreate,
-  CategoryEdit,
-  CategoryShow,
-} from "pages/categories";
+import routerBindings, {
+    UnsavedChangesNotifier,
+} from "@refinedev/react-router-v6";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <GitHubBanner />
-      <RefineKbarProvider>
-        <Refine
-          routerProvider={routerBindings}
-          dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
-          options={{
-            syncWithLocation: true,
-            warnWhenUnsavedChanges: true,
-          }}
-        >
-          <Routes>
-            <Route index element={<WelcomePage />} />
-          </Routes>
-          <RefineKbar />
-          <UnsavedChangesNotifier />
-        </Refine>
-      </RefineKbarProvider>
-    </BrowserRouter>
-  );
-}
+const App = () => {
+    return (
+        <BrowserRouter>
+            <Refine
+                routerProvider={routerBindings}
+                dataProvider={dataProvider("http://localhost:8000/api")}
+                resources={[
+                    {
+                        name: "places",
+                        list: "/places",
+                        show: "/places/show/:id",
+                        create: "/places/create",
+                        edit: "/places/edit/:id",
+                    },
+                ]}
+                options={{
+                    syncWithLocation: true,
+                    warnWhenUnsavedChanges: true,
+                }}
+            >
+                <Routes>
+                    <Route path="places">
+                        <Route index element={<HeadlessInferencer />} />
+                        <Route
+                            path="show/:id"
+                            element={<HeadlessInferencer />}
+                        />
+                        <Route
+                            path="edit/:id"
+                            element={<HeadlessInferencer />}
+                        />
+                        <Route path="create" element={<HeadlessInferencer />} />
+                    </Route>
+                </Routes>
+                <UnsavedChangesNotifier />
+            </Refine>
+        </BrowserRouter>
+    );
+};
 
 export default App;
